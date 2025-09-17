@@ -19,31 +19,30 @@ class Todo(db.Model):
 @app.route('/', methods=['GET', 'POST'])
 def hello_world():
     if request.method == 'POST':
-        # Get form data
         title = request.form['title']
         desc = request.form['desc']
-
-        # Create and save new todo
         todo = Todo(title=title, desc=desc)
         db.session.add(todo)
         db.session.commit()
 
-    # For both GET and POST, fetch all todos and render template
     allTodo = Todo.query.all()
-    print(allTodo)
     return render_template('index.html', allTodo=allTodo)
 
 @app.route('/show')
 def products():
-    allTodo = Todo.query.all()
-    print(allTodo)
     return 'this is products page'
 
-@app.route('/update')
-def update():
-    allTodo = Todo.query.all()
-    print(allTodo)
-    return 'this is products page'
+@app.route('/update/<int:sno>', methods=['GET', 'POST'])
+def Update(sno):
+    todo = Todo.query.filter_by(sno=sno).first()
+
+    if request.method == 'POST':
+        todo.title = request.form['title']
+        todo.desc = request.form['desc']
+        db.session.commit()
+        return redirect("/")
+
+    return render_template('update.html', todo=todo)
 
 @app.route('/delete/<int:sno>')
 def delete(sno):
